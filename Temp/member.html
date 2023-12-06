@@ -1,0 +1,197 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Registration Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: url("{% static 'assets/images/explore/Login.jpg' %}") no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            filter: brightness(1);
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .card {
+            background: rgba(248, 248, 248, 0.664);
+            border-radius: 10px;
+            padding: 20px;
+            width: 400px;
+            margin: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        /* Additional styles for new fields */
+        .row {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .col-sm-6 {
+            width: 48%;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            .container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .card {
+                width: 100%;
+                margin: 10px 0;
+            }
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+</head>
+
+<body>
+
+    <div class="container">
+        <!-- Left Card - Personal Information -->
+        <div class="card">
+            <h2 style="text-align: center; color: #333;">Personal Information</h2>
+            <form action="{% url 'bankapp:account_registration' %}" method="post">
+                {% csrf_token %}
+
+                <!-- Form fields for the first card -->
+                <label for="id_name">Name</label>
+                {{ form.name }}
+
+                <label for="id_dob">Date of Birth</label>
+                {{ form.dob }}
+
+                <label for="id_age">Age</label>
+                {{ form.age }}
+
+                <label for="id_age">Phone</label>
+                {{ form.phone }}
+
+                <label for="id_age">Gender</label>
+                {{ form.gender }}
+
+                <label for="id_district">District:</label>
+                <select name="district" id="id_district">
+                    {% for district in districts %}
+                        <option value="{{ district.id }}">{{ district.name }}</option>
+                    {% endfor %}
+                </select>
+                
+                <label for="id_branch">Branch:</label>
+                <select name="branch" id="id_branch" disabled>
+                    <option value="" selected="selected">---------</option>
+                    {% for branch in branches %}
+                        <option value="{{ branch.id }}">{{ branch.name }}</option>
+                    {% endfor %}
+                </select>
+                
+                
+
+        </div>
+
+        <!-- Right Card - Additional Information -->
+        <div class="card">
+            <h2 style="text-align: center; color: #333;">Additional Information</h2>
+
+            <!-- Form fields for the second card -->
+
+                <label for="id_email">Email Address</label>
+                {{ form.email }}
+
+                <label for="id_address">Address</label>
+                {{ form.address }}
+
+                <label for="id_account_type">Account Type</label>
+                {{ form.account_type }}
+
+                <label for="id_debit_card">Debit Card</label>
+                {{ form.debit_card }}
+
+                <label for="id_credit_card">Credit Card</label>
+                {{ form.credit_card }}
+
+                <label for="id_cheque_book">Cheque Book</label>
+                {{ form.cheque_book }}
+
+                <!-- Add other fields here... -->
+
+                <!-- Submit button for the second card -->
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+    </div>
+
+<script>
+    document.getElementById('id_district').addEventListener('change', function() {
+        var selectedDistrict = this.value;
+        var branchSelect = document.getElementById('id_branch');
+        branchSelect.innerHTML = '<option value="" selected="selected">---------</option>';
+
+        if (selectedDistrict) {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', '/get_branches/?district_id=' + selectedDistrict, true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    var branches = JSON.parse(xhr.responseText).branches;
+                    branches.forEach(function(branch) {
+                        var option = document.createElement('option');
+                        option.value = branch.id;
+                        option.textContent = branch.name;
+                        branchSelect.appendChild(option);
+                    });
+
+                    branchSelect.disabled = false;
+                }
+            };
+            xhr.send();
+        } else {
+            branchSelect.disabled = true;
+        }
+    });
+</script>
+</script>
+
+</body>
+
+</html>
